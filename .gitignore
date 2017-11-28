@@ -4,6 +4,7 @@ ehthumbs.db
 Desktop.ini
 report
 .idea
+.ini
 
 # Python:
 *.pyc

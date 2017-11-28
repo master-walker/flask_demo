@@ -2,11 +2,14 @@
 #coding=utf-8
 
 
-from app import app
-from flask import render_template, flash,redirect, request, make_response, session,url_for
-from .forms import LoginForm, FormDemo
 from datetime import datetime
-from database import db, User
+
+from flask import render_template, flash, redirect, request, session, url_for
+from app import app
+from app.database import db, Users, User
+from utils.common import send_mail
+from .forms import LoginForm, FormDemo, SignUp
+
 
 @app.route("/")
 def index():
@@ -75,6 +78,7 @@ def form_db():
             user = User(username=form.name.data)
             db.session.add(user)
             session["known"] = False
+            send_mail("807924140@qq.com","create successful","requirements")
         else:
             session["known"] = True
         session['name'] = form.name.data
@@ -86,6 +90,28 @@ def form_db():
 def form_mail():
     form = FormDemo()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.name.data)
+        user = Users.query.filter_by(username=form.name.data)
+
+# sign up
+@app.route("/register", methods=["GET","POST"])
+def register():
+    form = SignUp()
+    if form.validate_on_submit():
+        user = Users.query.filter_by(email_address=form.email_account.data).first()
+        if user is None:
+            db.create_all()
+            user = Users(email_address=form.email_account.data)
+            db.session.add(user)
+            send_mail(form.email_account.data,"email address verify"," verification code:1234")
+            session["known"] = False
+        else:
+            session["known"] = True
+        session["name"] = form.email_account.data
+        form.email_account.data = ""
+        return redirect(url_for("/register"))
+    return render_template("register.html",form=form,name=session.get("name"),known=session.get("known"))
+
+
+
 
 

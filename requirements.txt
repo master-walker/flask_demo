@@ -13,3 +13,4 @@ pytz
 flask-babel
 flup
 flask-bootstrap
+flask-migrate
